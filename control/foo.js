@@ -12,6 +12,9 @@ function main(){
 
 //    .after(5000, function() {this.clockwise(1);})
     .after(5000, function() {saveAnImage(client);})
+//    .after(5000, function() {this.clockwise(0.5);})
+//    .after(5000, function() {saveAnImage(client);})
+//    .after(5000, function() {this.counterClockwise(0.5);})
 //    .after(3000, function() {this.animate('flipLeft', 15);})
 //    .after(5000, function() {this.stop();this.land();});
 
@@ -35,7 +38,7 @@ function saveAnImage(client){
       .on('error', console.log)
       .on('data', function(pngBuffer) {
         // Exit after first image saved
-        if(frameCounter!=0){
+        if(frameCounter>3){
            console.log('Exiting PNGStream');
            process.exit();
          }
