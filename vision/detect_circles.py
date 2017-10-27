@@ -44,16 +44,23 @@ red_hue_image = cv2.addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1
 red_hue_image = cv2.GaussianBlur(red_hue_image, (9, 9), 2, 2)
 
 # Use the Hough transform to detect circles in the combined threshold image
-circles = cv2.HoughCircles(red_hue_image, cv2.HOUGH_GRADIENT, 1, red_hue_image.shape[0] / 8.0, 100, 20, 1, 1)
+circles = cv2.HoughCircles(red_hue_image, cv2.HOUGH_GRADIENT, 1.2, red_hue_image.shape[0] / 8.0, 100, 20, 10, 10)
 
 # Loop over all detected circles and outline them on the original image
 if circles is None or len(circles) == 0:
     print('No circles were found! Exiting.')
     exit()
+
+maxRadius = 0
+
 for current_circle in circles[0,:]:
     center = (int(current_circle[0]), int(current_circle[1]))
     radius = int(current_circle[2])
     cv2.circle(orig_image, center, radius, (0, 255, 0), 5)
+    if radius > maxRadius:
+        y = orig_image.shape[0]/2 - center[0]
+        x = orig_image.shape[1]/2 - center[1]
+        maxRadius = radius
 
 # Show images
 cv2.namedWindow("Threshold lower image", cv2.WINDOW_AUTOSIZE)
@@ -63,6 +70,7 @@ cv2.imshow("Threshold upper image", upper_red_hue_range)
 cv2.namedWindow("Combined threshold images", cv2.WINDOW_AUTOSIZE)
 cv2.imshow("Combined threshold images", red_hue_image)
 cv2.namedWindow("Detected red circles on the input image", cv2.WINDOW_AUTOSIZE)
+# cv2.line(orig_image,(int(orig_image.shape[0]/2),int(orig_image.shape[1]/2)),center,(255,0,0),5)
 cv2.imshow("Detected red circles on the input image", orig_image)
 print('Now showing the results in openCV windows. Press any key to exit.')
 
