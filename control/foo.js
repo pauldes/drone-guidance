@@ -1,7 +1,15 @@
+/* HIJACK & GUIDANCE PROJECT */
+/*        INSA Lyon          */
+/*   P.Désigaud / A.Stoica   */
+
+var pictureCount = 0
+main();
+
+/*****************************/
 
 function main(){
 
-  process.stdout.write("Here we go!");
+  console.log("Here we go!");
 
   var arDrone = require('ar-drone');
   var client = arDrone.createClient();
@@ -11,51 +19,52 @@ function main(){
   client
 
 //    .after(5000, function() {this.clockwise(1);})
-    .after(5000, function() {saveAnImage(client);})
+    .after(5000, function() {takePhoto(client);})
 //    .after(5000, function() {this.clockwise(0.5);})
-//    .after(5000, function() {saveAnImage(client);})
+    .after(10000, function() {takePhoto(client);})
 //    .after(5000, function() {this.counterClockwise(0.5);})
 //    .after(3000, function() {this.animate('flipLeft', 15);})
 //    .after(5000, function() {this.stop();this.land();});
-
     return 0;
 
   }
 
-function saveAnImage(client){
-
-    //var arDrone = require('ar-drone');
-    //var client = arDrone.createClient();
-    var fs = require('fs');
-
-    var pngStream = client.getPngStream();
-    var frameCounter = 0;
-    var saveDir = './img'; // Image Dir
-
-    console.log('Inside PNGStream');
-
-    pngStream
-      .on('error', console.log)
-      .on('data', function(pngBuffer) {
-        // Exit after first image saved
-        if(frameCounter>3){
-           console.log('Exiting PNGStream');
-           process.exit();
-         }
-
-        // Create ImageName and save to dir
-        var imageName = saveDir + '/savePNG' + '.png';
-        fs.writeFile(imageName, pngBuffer, function(err) {
-          if (err) {
-            console.log('Error saving PNG: ' + err);
-          }
-        });
-        console.log(imageName); // Output imagePath for use in parent
-
-        frameCounter++;
-      });
-      console.log('Leaving PNGSTREAM');
-    }
+function takePhoto(client,suffix) {
 
 
-main();
+  var fs = require('fs');
+  var pngStream = client.getPngStream();
+
+  var dir = './img/'
+
+  pngStream.once('data', function (data) { // 'once' could be 'on'
+      var now = new Date();
+      var nowFormat = getDateTime();
+
+      fs.writeFile(dir + nowFormat + '#'+ pictureCount + '.png', data, function (err) {
+          if (err)
+              console.error(err);
+          else
+              console.log('Photo saved');
+              pictureCount++;
+      })
+  });
+}
+
+function getDateTime() {
+    var date = new Date();
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+    var min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+    var sec  = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+    //var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+    return day + "-" + month + "@" + hour + "-" + min + "-" + sec;
+}
+
+
