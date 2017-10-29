@@ -19,7 +19,7 @@ def check_if_image_exist(path):
 
 if len(sys.argv) != 2:
     print("Error! Program usage:")
-    print("python opencv-reddot.py <image_circles_path>")
+    print("python detect-circle.py <image_circles_path>")
     exit()
 
 # Load input image
@@ -39,12 +39,17 @@ hsv_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2HSV)
 lower_red_hue_range = cv2.inRange(hsv_image, (0, 100, 100), (10, 255, 255))
 upper_red_hue_range = cv2.inRange(hsv_image, (160, 100, 100), (179, 255, 255))
 
+# Paul test: using BGR (blue green red) images instead of HSV (hue saturation value)
+#lower_red_hue_range = cv2.inRange(bgr_image, (0,0,0), (50, 50, 50))
+#upper_red_hue_range = cv2.inRange(bgr_image, (50,50,50), (255, 255, 255))
+
 # Combine the above two images
 red_hue_image = cv2.addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1.0, 0.0)
 red_hue_image = cv2.GaussianBlur(red_hue_image, (9, 9), 2, 2)
 
 # Use the Hough transform to detect circles in the combined threshold image
 circles = cv2.HoughCircles(red_hue_image, cv2.HOUGH_GRADIENT, 1.2, red_hue_image.shape[0] / 8.0, 100, 20)
+#circles = cv2.HoughCircles(red_hue_image, cv2.HOUGH_GRADIENT, 1.2, red_hue_image.shape[0] / 8.0, 1, 20)
 
 # Loop over all detected circles and outline them on the original image
 if circles is None or len(circles) == 0:
