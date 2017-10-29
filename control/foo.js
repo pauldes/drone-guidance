@@ -9,23 +9,24 @@ main();
 
 function main(){
 
-  console.log("Here we go!");
-
+  console.log("Launching foo.js script");
   var arDrone = require('ar-drone');
+  console.log("Connecting to the drone...");
   var client = arDrone.createClient();
+  console.log("Success ! Starting operations");
 
 //  client.takeoff();
+
+  takePhoto(client);
 
   client
 
 //    .after(5000, function() {this.clockwise(1);})
-    .after(5000, function() {takePhoto(client);})
 //    .after(5000, function() {this.clockwise(0.5);})
-    .after(10000, function() {takePhoto(client);})
+      .after(10000, function() {takePhoto(client);})
 //    .after(5000, function() {this.counterClockwise(0.5);})
 //    .after(3000, function() {this.animate('flipLeft', 15);})
-//    .after(5000, function() {this.stop();this.land();});
-    return 0;
+//    .after(5000, function() {this.stop();this.land();})
 
   }
 
