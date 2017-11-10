@@ -2,7 +2,13 @@
 /*        INSA Lyon          */
 /*   P.Désigaud / A.Stoica   */
 
-var pictureCount = 0
+var currentPictureCount = 0;
+var currentRadius = 0;
+var dir = 'bin/';
+var FRAMERATE_TRACKING = 0.1;
+var TRESHOLD_UP = -20;
+var TRESHOLD_DOWN = 20;
+
 main();
 
 /*****************************/
@@ -14,11 +20,11 @@ function main(){
   console.log("Launching foo.js script");
   var arDrone = require('ar-drone');
   console.log("Connecting to the drone...");
-  var client = arDrone.createClient({'frameRate':'0.1'});
-  client.animateLeds('blinkGreen', 5, 1)
+  var client = arDrone.createClient({'frameRate':FRAMERATE_TRACKING});
+  client.animateLeds('snakeGreenRed', 5, 1)
   console.log("Success ! Starting operations");
 
-  client.takePhotoStream(client);
+  takePhotoStream(client);
 
 //  client.takeoff();
 
@@ -37,20 +43,18 @@ function takePhotoStream(client) {
   var fs = require('fs');
   var pngStream = client.getPngStream();
 
-  var dir = '../img/';
-
   pngStream.on('data', function (data) { // 'once' could be 'on'
 
       var nowFormat = getDateTime();
 
-      fs.writeFile(dir + nowFormat + '#'+ pictureCount + '.png', data, function (err) {
+      fs.writeFile(dir + nowFormat + '#'+ currentPictureCount + '.png', data, function (err) {
           if (err)
               console.error(err);
           else
-              client.animateLeds('blinkRed', 5, 1)
+              client.animateLeds('blinkOrange', 5, 1);
               console.log('Photo saved');
-              findTarget(dir + nowFormat + '#'+ pictureCount + '.png',4000);
-              pictureCount++;
+              findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',(1/FRAMERATE_TRACKING)-2000,client);
+              currentPictureCount++;
 
       })
   });
@@ -61,19 +65,17 @@ function takePhoto(client) {
   var fs = require('fs');
   var pngStream = client.getPngStream();
 
-  var dir = '../img/';
-
   pngStream.once('data', function (data) { // 'once' could be 'on'
 
       var nowFormat = getDateTime();
 
-      fs.writeFile(dir + nowFormat + '#'+ pictureCount + '.png', data, function (err) {
+      fs.writeFile(dir + nowFormat + '#'+ currentPictureCount + '.png', data, function (err) {
           if (err)
               console.error(err);
           else
-              console.log('Photo saved');
-              findTarget(dir + nowFormat + '#'+ pictureCount + '.png',4000);
-              pictureCount++;
+              //console.log('Photo saved');
+              findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',4000);
+              currentPictureCount++;
 
       })
   });
@@ -95,7 +97,7 @@ function getDateTime() {
     return day + "-" + month + "@" + hour + "-" + min + "-" + sec;
 }
 
-function findTarget(img_url, period) {
+function findTarget(img_url, period, client) {
 
   var python_script_url = '../vision/'+'detect_blobs.py';
 
@@ -105,17 +107,48 @@ function findTarget(img_url, period) {
   process.stdout.on('data',function(data){
 
     if( ! data.toString().startsWith('{')){
+      client.animateLeds('blinkRed', 5, 1);
       console.log(data.toString());
     }
     else{
+      client.animateLeds('blinkGreen', 5, 1)
       var jsonData = JSON.parse(data.toString());
-      var radius = jsonData['r'];
-      var vector_x = jsonData['vx'];
-      var vector_y = jsonData['vy'];
-      console.log('data retrieved');
+      var r = jsonData['r'];
+      var vx = jsonData['vx'];
+      var vy = jsonData['vy'];
+      console.log('I should '+getNextAction(r,vx,vy));
     }
-
   });
+
+}
+
+function getNextAction(r,vx,vy){
+  var old_r = currentRadius;
+  var direction = 'unexpected';
+  if(vy<TRESHOLD_UP){
+    direction = 'GO_UP';
+  } else
+  if (vy>TRESHOLD_DOWN){
+    direction = 'GO_DOWN';
+  } else
+  {
+    direction = 'WAIT';
+  }
+  return direction;
+}
+
+function doAction(action_keyword,client){
+
+  switch(action_keyword) {
+      case 'GO_UP':
+          client.up(speed);
+          break;
+      case 'GO_DOWN':
+          client.down(speed);
+          break;
+      default:
+          console.log(action_keyword);
+  }
 
 }
 
