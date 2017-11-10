@@ -20,8 +20,6 @@ if len(sys.argv) != 2:
 bgr    = cv2.imread(sys.argv[1])
 output = bgr.copy()
 
-
-
 #Convert to HSV color space
 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
