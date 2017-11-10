@@ -27,11 +27,14 @@ function main(){
 //    .after(5000, function() {this.counterClockwise(0.5);})
 //    .after(3000, function() {this.animate('flipLeft', 15);})
 //    .after(5000, function() {this.stop();this.land();})
+      ;
+
+  client.after(10000, function() {takePhoto(client);});
+
 
   }
 
 function takePhoto(client,suffix) {
-
 
   var fs = require('fs');
   var pngStream = client.getPngStream();
