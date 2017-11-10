@@ -57,8 +57,7 @@ def main(input_image_url):
   MIN_BLOB_RADIUS = 14
 
   if len(blobs) >0:
-    #output = cv2.drawKeypoints(output, blobs, np.array([]),(0,0,255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    print(str(len(blobs))+' blobs found')
+    #print(str(len(blobs))+' blobs found')
 
     biggest_blob_r  = 0
 
@@ -97,6 +96,7 @@ def main(input_image_url):
 
   cv2.namedWindow("output", cv2.WINDOW_NORMAL)
   cv2.imshow("output", output)
+
   '''
   cv2.namedWindow("mask", cv2.WINDOW_NORMAL)
   cv2.imshow("mask", mask)
@@ -120,5 +120,6 @@ if __name__ == "__main__":
 
     else:
       main(sys.argv[1])
+      sys.stdout.flush()
       cv2.waitKey(int(sys.argv[2]))
 

@@ -9,6 +9,10 @@ main();
 
 function main(){
 
+  findTarget("../img/30-10@11-18-59#0.png",1000);
+
+  /*
+
   console.log("Launching foo.js script");
   var arDrone = require('ar-drone');
   console.log("Connecting to the drone...");
@@ -30,6 +34,8 @@ function main(){
       ;
 
   client.after(10000, function() {takePhoto(client);});
+
+  */
 
 
   }
@@ -69,6 +75,25 @@ function getDateTime() {
     var day  = date.getDate();
     day = (day < 10 ? "0" : "") + day;
     return day + "-" + month + "@" + hour + "-" + min + "-" + sec;
+}
+
+function findTarget(img_url, period) {
+
+  var python_script_url = '../vision/'+'detect_blobs.py';
+
+  var spawn = require('child_process').spawn;
+  var process = spawn('python',[python_script_url,img_url,period]);
+
+  process.stdout.on('data',function(data){
+
+    if( ! data.toString().startsWith('{')){
+      console.log(data.toString());
+    }
+
+    jsonData = JSON.parse(data.toString())
+
+  });
+
 }
 
 
