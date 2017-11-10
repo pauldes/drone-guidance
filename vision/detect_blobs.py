@@ -1,11 +1,3 @@
-'''
-P.Désigaud
-INSA Lyon
-github.com/pauldes
-A python algorithm using OpenCV's BlobDetector to find a red circle in a picture
-Optimized for a 720p cheap camera (webcam, Parrot AR Drone)
-'''
-
 def main(input_image_url):
 
   # Load the image
@@ -128,4 +120,5 @@ if __name__ == "__main__":
 
     else:
       main(sys.argv[1])
-      cv2.waitKey(int(sys.argv[2])
+      cv2.waitKey(int(sys.argv[2]))
+
