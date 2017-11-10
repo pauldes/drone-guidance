@@ -9,9 +9,7 @@ main();
 
 function main(){
 
-  findTarget("../img/30-10@11-18-59#0.png",1000);
-
-  /*
+  //findTarget("../img/30-10@11-18-59#0.png",1000);
 
   console.log("Launching foo.js script");
   var arDrone = require('ar-drone');
@@ -21,34 +19,34 @@ function main(){
 
 //  client.takeoff();
 
-  takePhoto(client);
+
 
   client
 
 //    .after(5000, function() {this.clockwise(1);})
 //    .after(5000, function() {this.clockwise(0.5);})
       .after(10000, function() {takePhoto(client);})
+      .after(10000, function() {takePhoto(client);})
+      .after(10000, function() {takePhoto(client);})
+      .after(10000, function() {takePhoto(client);})
+      .after(10000, function() {takePhoto(client);})
 //    .after(5000, function() {this.counterClockwise(0.5);})
 //    .after(3000, function() {this.animate('flipLeft', 15);})
 //    .after(5000, function() {this.stop();this.land();})
+      .after(10000, function() {process.exit();})
       ;
-
-  client.after(10000, function() {takePhoto(client);});
-
-  */
-
 
   }
 
-function takePhoto(client,suffix) {
+function takePhoto(client) {
 
   var fs = require('fs');
   var pngStream = client.getPngStream();
 
-  var dir = './img/'
+  var dir = '../img/';
 
   pngStream.once('data', function (data) { // 'once' could be 'on'
-      var now = new Date();
+
       var nowFormat = getDateTime();
 
       fs.writeFile(dir + nowFormat + '#'+ pictureCount + '.png', data, function (err) {
@@ -56,7 +54,9 @@ function takePhoto(client,suffix) {
               console.error(err);
           else
               console.log('Photo saved');
+              findTarget(dir + nowFormat + '#'+ pictureCount + '.png',4000);
               pictureCount++;
+
       })
   });
 }
@@ -89,8 +89,13 @@ function findTarget(img_url, period) {
     if( ! data.toString().startsWith('{')){
       console.log(data.toString());
     }
-
-    jsonData = JSON.parse(data.toString())
+    else{
+      var jsonData = JSON.parse(data.toString());
+      var radius = jsonData['r'];
+      var vector_x = jsonData['vx'];
+      var vector_y = jsonData['vy'];
+      console.log('data retrieved');
+    }
 
   });
 
