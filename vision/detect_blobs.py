@@ -33,11 +33,11 @@ def main(input_image_url):
   params = cv2.SimpleBlobDetector_Params()
   # params.minThreshold = 10;
   # params.maxThreshold = 200;
-  # params.filterByArea = True
+  params.filterByArea = False
   # params.minArea = 1500
-  # params.filterByCircularity = True
+  params.filterByCircularity = False
   # params.minCircularity = 0.1
-  # params.filterByConvexity = True
+  params.filterByConvexity = False
   # params.minConvexity = 0.87
   # 0=bar, 1=circle
   params.filterByInertia = True
