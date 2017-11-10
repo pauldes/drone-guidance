@@ -141,10 +141,12 @@ function doAction(action_keyword,client){
 
   switch(action_keyword) {
       case 'GO_UP':
-          client.up(speed);
+          client.up(0.2);
+          //TODO limit ? or going upward forever ?
           break;
       case 'GO_DOWN':
-          client.down(speed);
+          client.down(0.2);
+          //TODO limit ? or going downward forever ?
           break;
       default:
           console.log(action_keyword);
