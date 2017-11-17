@@ -43,7 +43,7 @@ function takePhotoStream(client) {
   var fs = require('fs');
   var pngStream = client.getPngStream();
 
-  pngStream.on('data', function (data) { // 'once' could be 'on'
+  pngStream.on('data', function (data) { // 'once' OR 'on'
 
       var nowFormat = getDateTime();
 
@@ -53,7 +53,7 @@ function takePhotoStream(client) {
           else
               client.animateLeds('blinkOrange', 5, 1);
               console.log('Photo saved');
-              findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',(1/FRAMERATE_TRACKING)-2000,client);
+              findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',(1000/FRAMERATE_TRACKING)-2000,client);
               currentPictureCount++;
 
       })
@@ -99,10 +99,19 @@ function getDateTime() {
 
 function findTarget(img_url, period, client) {
 
-  var python_script_url = '../vision/'+'detect_blobs.py';
+  console.log('Finding target...');
+
+  var python_script_url = 'detect_blobs.py';
+  var real_img_url = img_url;
+
+  console.log(real_img_url);
 
   var spawn = require('child_process').spawn;
-  var process = spawn('python',[python_script_url,img_url,period]);
+  var process = spawn('python',[python_script_url,real_img_url,period]);
+
+  process.stderr.on('data',function(data){
+    console.log('PYTHON ERROR: '+data.toString());
+  });
 
   process.stdout.on('data',function(data){
 
@@ -142,7 +151,7 @@ function doAction(action_keyword,client){
   switch(action_keyword) {
       case 'GO_UP':
           client.up(0.2);
-          //TODO limit ? or going upward forever ?
+          //TODO limit ? or going upward forever ? stop() ?
           break;
       case 'GO_DOWN':
           client.down(0.2);

@@ -9,10 +9,10 @@ def main(input_image_url):
 
   # Red range 1 (hue from 0 to 40)
   lower_red1 = np.array([0,120,50])
-  upper_red1 = np.array([40,220,150])
+  upper_red1 = np.array([40,220,200])
   # Red range 2 (hue from 140 to 180)
   lower_red2 = np.array([140,120,50])
-  upper_red2 = np.array([180,220,150])
+  upper_red2 = np.array([180,220,200])
   # H: 0 - 180, S: 0 - 255, V: 0 - 255
 
   #Creating the color masks
@@ -97,12 +97,12 @@ def main(input_image_url):
   cv2.namedWindow("output", cv2.WINDOW_NORMAL)
   cv2.imshow("output", output)
 
-  '''
+
   cv2.namedWindow("mask", cv2.WINDOW_NORMAL)
   cv2.imshow("mask", mask)
   cv2.namedWindow("hsv", cv2.WINDOW_NORMAL)
   cv2.imshow("hsv", hsv)
-  '''
+
   #cv2.waitKey(0)
 
 
