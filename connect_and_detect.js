@@ -5,9 +5,10 @@
 var currentPictureCount = 0;
 var currentRadius = 0;
 var dir = 'bin/';
-var FRAMERATE_TRACKING = 0.1;
+var FRAMERATE_TRACKING = 1;
 var TRESHOLD_UP = -20;
 var TRESHOLD_DOWN = 20;
+var TRESHOLD_RADIUS = 40;
 
 main();
 
@@ -17,14 +18,16 @@ function main(){
 
   //findTarget("../img/30-10@11-18-59#0.png",1000);
 
-  console.log("Launching foo.js script");
+  console.log("Launching connect_and_detect.js script");
   var arDrone = require('ar-drone');
   console.log("Connecting to the drone...");
   var client = arDrone.createClient({'frameRate':FRAMERATE_TRACKING});
+//  require('ar-drone-png-stream')(client, { port: 8000 });
   client.animateLeds('snakeGreenRed', 5, 1)
   console.log("Success ! Starting operations");
 
   takePhotoStream(client);
+  
 
 //  client.takeoff();
 
@@ -44,7 +47,6 @@ function takePhotoStream(client) {
   var pngStream = client.getPngStream();
 
   pngStream.on('data', function (data) { // 'once' OR 'on'
-
       var nowFormat = getDateTime();
 
       fs.writeFile(dir + nowFormat + '#'+ currentPictureCount + '.png', data, function (err) {
@@ -53,7 +55,7 @@ function takePhotoStream(client) {
           else
               client.animateLeds('blinkOrange', 5, 1);
               console.log('Photo saved');
-              findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',(1000/FRAMERATE_TRACKING)-2000,client);
+              findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',(1000/FRAMERATE_TRACKING),client);
               currentPictureCount++;
 
       })
@@ -132,17 +134,19 @@ function findTarget(img_url, period, client) {
 }
 
 function getNextAction(r,vx,vy){
-  var old_r = currentRadius;
+  var old_r = r;
   var direction = 'unexpected';
-  if(vy<TRESHOLD_UP){
-    direction = 'GO_UP';
-  } else
-  if (vy>TRESHOLD_DOWN){
-    direction = 'GO_DOWN';
-  } else
-  {
+
+  if(r > TRESHOLD_RADIUS - 5){
+    direction = 'GO_BACK';
+  }
+  else if(r < TRESHOLD_RADIUS + 5){
+    direction = 'GO_FORWARD';
+  }
+  else{
     direction = 'WAIT';
   }
+
   return direction;
 }
 

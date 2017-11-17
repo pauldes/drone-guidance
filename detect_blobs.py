@@ -94,10 +94,10 @@ def main(input_image_url):
   cv2.namedWindow("output", cv2.WINDOW_NORMAL)
   cv2.imshow("output", output)
 
-  cv2.namedWindow("mask", cv2.WINDOW_NORMAL)
-  cv2.imshow("mask", mask)
-  cv2.namedWindow("hsv", cv2.WINDOW_NORMAL)
-  cv2.imshow("hsv", hsv)
+  # cv2.namedWindow("mask", cv2.WINDOW_NORMAL)
+  # cv2.imshow("mask", mask)
+  # cv2.namedWindow("hsv", cv2.WINDOW_NORMAL)
+  # cv2.imshow("hsv", hsv)
 
 
 if __name__ == "__main__":
