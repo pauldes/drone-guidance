@@ -26,7 +26,7 @@ def main(input_image_url):
   mask=cv2.bitwise_not(mask)
   # Now the target is black and background is white
   # Blur slightly
-  mask = cv2.GaussianBlur(mask,(5,5),0)
+  mask = cv2.GaussianBlur(mask,(5,5),100,100)
 
 
   # Setup SimpleBlobDetector parameters.
@@ -53,7 +53,7 @@ def main(input_image_url):
   # Find the blobs
   blobs = detector.detect(mask)
 
-  MAX_BLOB_RADIUS = 140
+  MAX_BLOB_RADIUS = 720
   MIN_BLOB_RADIUS = 14
 
   if len(blobs) >0:
@@ -91,20 +91,13 @@ def main(input_image_url):
   else:
     print('NOTHING_FOUND')
 
-  cv2.circle(output, (int(output.shape[1]/2),int(output.shape[0]/2)), MIN_BLOB_RADIUS, (100, 100, 100), 2)
-  cv2.circle(output, (int(output.shape[1]/2),int(output.shape[0]/2)), MAX_BLOB_RADIUS, (100, 100, 100), 2)
-
   cv2.namedWindow("output", cv2.WINDOW_NORMAL)
   cv2.imshow("output", output)
-
 
   cv2.namedWindow("mask", cv2.WINDOW_NORMAL)
   cv2.imshow("mask", mask)
   cv2.namedWindow("hsv", cv2.WINDOW_NORMAL)
   cv2.imshow("hsv", hsv)
-
-  #cv2.waitKey(0)
-
 
 
 if __name__ == "__main__":
