@@ -47,3 +47,6 @@ Temporary Items
 .apdisk
 
 control/img/*
+
+bin/*
+bin\*

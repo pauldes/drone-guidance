@@ -73,20 +73,21 @@ if __name__=='__main__':
     # From https://www.adminsub.net/mac-address-finder/
     possible_MACs_freebox = ['E4:3U:12','E4:9E:12']
     possible_MACs_parrot = ['A0:14:3D','90:3A:E6','90:03:B7','00:26:7E','00:12:1C']
+    prefix_AP = 'ardrone' #Can be empty
 
     # Must be high in a high-network-density space
-    dumping_timeout = 10
+    dumping_timeout = 20
 
     # Do not deauth myself :p
-    my_MAC_adress = 'xx:xx:xx:xx:xx:xx'
+    my_MAC_adress = 'B8:8A:60:BD:86:DE'
 
     create_interface()
     prepare_environment()
     clear_bin()
-    dump_wifi(regex_AP="Freebox",output_file="./bin/out", timeout=dumping_timeout)
+    dump_wifi(regex_AP=prefix_AP,output_file="./bin/out", timeout=dumping_timeout)
 
-    # read MACs, channel from out file
-    connections_info = extract_infos("./bin/out",possible_MACs_freebox,ignore_MAC=my_MAC_adress)
+  # read MACs, channel from out file
+    connections_info = extract_infos("./bin/out",possible_MACs_parrot,ignore_MAC=my_MAC_adress)
 
     if(connections_info['ERROR']):
         print("Error - Nothing found with the provided MACs and ESSID.")
