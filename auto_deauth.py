@@ -79,7 +79,7 @@ if __name__=='__main__':
     dumping_timeout = 20
 
     # Do not deauth myself :p
-    my_MAC_adress = 'B8:8A:60:BD:86:DE'
+    my_MAC_adress = 'xx:xx:xx:xx:xx:xx'
 
     create_interface()
     prepare_environment()
