@@ -3,12 +3,13 @@
 /*   P.Désigaud / A.Stoica   */
 
 var currentPictureCount = 0;
-var currentRadius = 0;
 var dir = 'bin/';
 var FRAMERATE_TRACKING = 1;
-var TRESHOLD_UP = -20;
-var TRESHOLD_DOWN = 20;
+var TRESHOLD_X = 100;
 var TRESHOLD_RADIUS = 40;
+var SPEED_ROTATION = 0.2;
+var SPEED_TRANSLATION = 0.2;
+var ACTION_PERIOD = 1000;
 
 main();
 
@@ -16,17 +17,15 @@ main();
 
 function main(){
 
-  //findTarget("../img/30-10@11-18-59#0.png",1000);
-
   console.log("Launching connect_and_detect.js script");
   var arDrone = require('ar-drone');
   console.log("Connecting to the drone...");
   var client = arDrone.createClient({'frameRate':FRAMERATE_TRACKING});
-//  require('ar-drone-png-stream')(client, { port: 8000 });
   client.animateLeds('snakeGreenRed', 5, 1)
   console.log("Success ! Starting operations");
 
   takePhotoStream(client);
+  //  require('ar-drone-png-stream')(client, { port: 8000 });
   
 
 //  client.takeoff();
@@ -128,6 +127,7 @@ function findTarget(img_url, period, client) {
       var vx = jsonData['vx'];
       var vy = jsonData['vy'];
       console.log('I should '+getNextAction(r,vx,vy));
+      // doAction(getNextAction(r,vx,vy),client);
     }
   });
 
@@ -137,7 +137,13 @@ function getNextAction(r,vx,vy){
   var old_r = r;
   var direction = 'unexpected';
 
-  if(r > TRESHOLD_RADIUS - 5){
+  if(vx > TRESHOLD_X){
+    direction = 'GO_RIGHT';
+  }
+  else if(vx < - TRESHOLD_X){
+    direction = 'GO_LEFT';
+  }
+  else if(r > TRESHOLD_RADIUS - 5){
     direction = 'GO_BACK';
   }
   else if(r < TRESHOLD_RADIUS + 5){
@@ -153,18 +159,33 @@ function getNextAction(r,vx,vy){
 function doAction(action_keyword,client){
 
   switch(action_keyword) {
-      case 'GO_UP':
-          client.up(0.2);
-          //TODO limit ? or going upward forever ? stop() ?
+      case 'GO_RIGHT':
+          client.clockwise(SPEED_ROTATION);
+          client.after(ACTION_PERIOD, function(){
+            this.stop();
+          });
           break;
-      case 'GO_DOWN':
-          client.down(0.2);
-          //TODO limit ? or going downward forever ?
+      case 'GO_LEFT':
+          client.counterClockwise(SPEED_ROTATION);
+          client.after(ACTION_PERIOD, function(){
+            this.stop();
+          });
+          break;
+      case 'GO_FORWARD':
+          client.front(SPEED_TRANSLATION);
+          client.after(ACTION_PERIOD, function(){
+            this.stop();
+          });
+          break;
+      case 'GO_BACK':
+          client.back(SPEED_TRANSLATION);
+          client.after(ACTION_PERIOD, function(){
+            this.stop();
+          });
           break;
       default:
+          client.stop();
           console.log(action_keyword);
   }
 
 }
-
-
