@@ -4,12 +4,14 @@
 
 var currentPictureCount = 0;
 var dir = 'bin/';
-var FRAMERATE_TRACKING = 1;
+var FRAMERATE_TRACKING = 10;
 var TRESHOLD_X = 100;
 var TRESHOLD_RADIUS = 40;
-var SPEED_ROTATION = 0.2;
+var EPSILON_RADIUS = 10;
+var SPEED_ROTATION = 0.1;
 var SPEED_TRANSLATION = 0.2;
-var ACTION_PERIOD = 1000;
+var PERIOD_ROTATION = 500;
+var PERIOD_TRANSLATION = 1500;
 
 main();
 
@@ -24,11 +26,19 @@ function main(){
   client.animateLeds('snakeGreenRed', 5, 1)
   console.log("Success ! Starting operations");
 
-  takePhotoStream(client);
-  //  require('ar-drone-png-stream')(client, { port: 8000 });
+  client.takeoff();
+  client.after(10000,function(){
+    //takePhotoStream(this);
+    doAction('GO_RIGHT',this);
+  }).after(10000,function(){
+    this.land();
+  });
+  //takePhotoStream(client);
+  //require('ar-drone-png-stream')(client, { port: 8000 });
   
 
-//  client.takeoff();
+  //client.takeoff();
+  //doAction('GO_BACK',client);
 
 //  client
 //    .after(5000, function() {this.clockwise(1);})
@@ -44,20 +54,39 @@ function takePhotoStream(client) {
 
   var fs = require('fs');
   var pngStream = client.getPngStream();
+  var period = 10;
+  var counter = 10;
+
+  var global_counter = 0;
+  var global_limit = 20;
 
   pngStream.on('data', function (data) { // 'once' OR 'on'
-      var nowFormat = getDateTime();
 
-      fs.writeFile(dir + nowFormat + '#'+ currentPictureCount + '.png', data, function (err) {
-          if (err)
-              console.error(err);
-          else
-              client.animateLeds('blinkOrange', 5, 1);
-              console.log('Photo saved');
-              findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',(1000/FRAMERATE_TRACKING),client);
-              currentPictureCount++;
+    if(global_counter==global_limit-1){
+      client.land();
+    } else if(global_counter==global_limit){
+      //nothing
+    } else {
+      if (counter==period){
+        global_counter++;
+        counter = 0;
+        var nowFormat = getDateTime();
 
-      })
+        fs.writeFile(dir + nowFormat + '#'+ currentPictureCount + '.png', data, function (err) {
+            if (err)
+                console.error(err);
+            else{
+                client.animateLeds('blinkOrange', 5, 1);
+                console.log('Photo saved');
+                findTarget(dir + nowFormat + '#'+ currentPictureCount + '.png',(1000*period/FRAMERATE_TRACKING),client);
+                currentPictureCount++;
+            }
+        })
+      }
+      else{
+        counter++;
+      }
+    }
   });
 }
 
@@ -134,19 +163,16 @@ function findTarget(img_url, period, client) {
 }
 
 function getNextAction(r,vx,vy){
-  var old_r = r;
-  var direction = 'unexpected';
 
   if(vx > TRESHOLD_X){
     direction = 'GO_RIGHT';
   }
   else if(vx < - TRESHOLD_X){
     direction = 'GO_LEFT';
-  }
-  else if(r > TRESHOLD_RADIUS - 5){
+  }else if(r > TRESHOLD_RADIUS + EPSILON_RADIUS){
     direction = 'GO_BACK';
   }
-  else if(r < TRESHOLD_RADIUS + 5){
+  else if(r < TRESHOLD_RADIUS - EPSILON_RADIUS){
     direction = 'GO_FORWARD';
   }
   else{
@@ -161,27 +187,19 @@ function doAction(action_keyword,client){
   switch(action_keyword) {
       case 'GO_RIGHT':
           client.clockwise(SPEED_ROTATION);
-          client.after(ACTION_PERIOD, function(){
-            this.stop();
-          });
+          client.after(PERIOD_ROTATION, function(){this.stop();});
           break;
       case 'GO_LEFT':
           client.counterClockwise(SPEED_ROTATION);
-          client.after(ACTION_PERIOD, function(){
-            this.stop();
-          });
+          client.after(PERIOD_ROTATION, function(){this.stop();});
           break;
       case 'GO_FORWARD':
           client.front(SPEED_TRANSLATION);
-          client.after(ACTION_PERIOD, function(){
-            this.stop();
-          });
+          client.after(PERIOD_TRANSLATION, function(){this.stop();});
           break;
       case 'GO_BACK':
           client.back(SPEED_TRANSLATION);
-          client.after(ACTION_PERIOD, function(){
-            this.stop();
-          });
+          client.after(PERIOD_TRANSLATION, function(){this.stop();});
           break;
       default:
           client.stop();
