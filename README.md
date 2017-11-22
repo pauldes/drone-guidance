@@ -1,11 +1,16 @@
-1/ Installer la librairie avec:
+This project aims to hijack a connected Parrot drone and make him follow a target.
 
+Install dependencies:
+
+Node-ar-drone 
 ```bash
 npm install git://github.com/felixge/node-ar-drone.git
 ```
-OU
+OpenCV for Python
 ```bash
-npm install ar-drone
+pip install opencv-python
 ```
 
-2/ Lire la doc dans about_ar-drone.md
+
+
+
