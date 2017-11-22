@@ -75,6 +75,7 @@ def main(input_image_url):
             biggest_blob_y = y
 
           cv2.circle(output, (x, y), r, (255, 225, 255), 2)
+          cv2.circle(mask, (x, y), r, (0, 225, 0), 2)
 
     if(biggest_blob_r>0):
       # Compute distance to center
@@ -93,11 +94,16 @@ def main(input_image_url):
 
   cv2.namedWindow("output", cv2.WINDOW_NORMAL)
   cv2.imshow("output", output)
+  
+  # cv2.imwrite('output.png',output)
 
   # cv2.namedWindow("mask", cv2.WINDOW_NORMAL)
   # cv2.imshow("mask", mask)
+  # cv2.imwrite('mask.png',mask)
+
   # cv2.namedWindow("hsv", cv2.WINDOW_NORMAL)
   # cv2.imshow("hsv", hsv)
+  # cv2.imwrite('hsv.png',hsv)
 
 
 if __name__ == "__main__":
