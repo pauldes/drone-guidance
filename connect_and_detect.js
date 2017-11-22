@@ -8,9 +8,9 @@ var FRAMERATE_TRACKING = 10;
 var TRESHOLD_X = 100;
 var TRESHOLD_RADIUS = 40;
 var EPSILON_RADIUS = 10;
-var SPEED_ROTATION = 0.1;
+var SPEED_ROTATION = 0.3;
 var SPEED_TRANSLATION = 0.2;
-var PERIOD_ROTATION = 500;
+var PERIOD_ROTATION = 1000;
 var PERIOD_TRANSLATION = 1500;
 
 main();
@@ -27,12 +27,13 @@ function main(){
   console.log("Success ! Starting operations");
 
   client.takeoff();
-  client.after(10000,function(){
-    //takePhotoStream(this);
-    doAction('GO_RIGHT',this);
-  }).after(10000,function(){
-    this.land();
-  });
+  client.after(5000,function(){ doAction('GO_RIGHT',this);})
+    .after(PERIOD_ROTATION, function(){this.stop(); doAction('GO_LEFT',this);})
+    .after(PERIOD_ROTATION, function(){this.stop();})
+    .after(2000,function(){ this.stop(); this.land(); })
+    .after(5000, function() {process.exit();});
+
+
   //takePhotoStream(client);
   //require('ar-drone-png-stream')(client, { port: 8000 });
   
@@ -40,14 +41,14 @@ function main(){
   //client.takeoff();
   //doAction('GO_BACK',client);
 
-//  client
-//    .after(5000, function() {this.clockwise(1);})
-//    .after(10000, function() {takePhoto(client);})
-//    .after(5000, function() {this.counterClockwise(0.5);})
-//    .after(3000, function() {this.animate('flipLeft', 15);})
-//    .after(5000, function() {this.stop();this.land();})
-//    .after(10000, function() {process.exit();})
-//      ;
+/* client
+   .after(5000, function() {this.clockwise(1);})
+   .after(10000, function() {takePhoto(client);})
+   .after(5000, function() {this.counterClockwise(0.5);})
+   .after(3000, function() {this.animate('flipLeft', 15);})
+   .after(5000, function() {this.stop();this.land();})
+   .after(10000, function() {process.exit();})
+     ;*/
   }
 
 function takePhotoStream(client) {
@@ -186,13 +187,13 @@ function doAction(action_keyword,client){
 
   switch(action_keyword) {
       case 'GO_RIGHT':
+          console.log("I am starting to go right");
           client.clockwise(SPEED_ROTATION);
-          client.after(PERIOD_ROTATION, function(){this.stop();});
-          break;
+          break;  
       case 'GO_LEFT':
+          console.log("I am starting to go left");
           client.counterClockwise(SPEED_ROTATION);
-          client.after(PERIOD_ROTATION, function(){this.stop();});
-          break;
+          break;    
       case 'GO_FORWARD':
           client.front(SPEED_TRANSLATION);
           client.after(PERIOD_TRANSLATION, function(){this.stop();});
@@ -204,6 +205,7 @@ function doAction(action_keyword,client){
       default:
           client.stop();
           console.log(action_keyword);
+          break;
   }
 
 }
