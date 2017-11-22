@@ -4,14 +4,14 @@
 
 var currentPictureCount = 0;
 var dir = 'bin/';
-var FRAMERATE_TRACKING = 20;
+var FRAMERATE_TRACKING = 10;
 var TRESHOLD_X = 100;
 var TRESHOLD_RADIUS = 40;
 var EPSILON_RADIUS = 10;
 var SPEED_ROTATION = 0.3;
 var SPEED_TRANSLATION = 0.2;
-var PERIOD_ROTATION = 1000;
-var PERIOD_TRANSLATION = 1500;
+var PERIOD_ROTATION = 600;
+var PERIOD_TRANSLATION = 600;
 
 main();
 
@@ -26,7 +26,7 @@ function main(){
   client.animateLeds('snakeGreenRed', 5, 1)
   console.log("Success ! Starting operations");
 
-  //client.takeoff();
+  client.takeoff();
 
   /*
   client.after(5000,function(){ doAction('GO_RIGHT',this);})
@@ -38,9 +38,9 @@ function main(){
 
   //process.wait(8);
 
-  //setTimeout(takePhotoStream(client),6000);
+  setTimeout(function(){takePhotoStream(client)},2000);
 
-  takePhotoStream(client);
+  //takePhotoStream(client);
 
   //require('ar-drone-png-stream')(client, { port: 8000 });
 
@@ -62,16 +62,16 @@ function takePhotoStream(client) {
 
   var fs = require('fs');
   var pngStream = client.getPngStream();
-  var period = 20;
-  var counter = 20;
+  var period = 10;
+  var counter = 10;
 
   var global_counter = 0;
-  var global_limit = 10;
+  var global_limit = 30;
 
   pngStream.on('data', function (data) { // 'once' OR 'on'
 
 
-    //if(global_counter<global_limit-1){
+    if(global_counter<global_limit-1){
 
       if (counter==period){
 
@@ -96,17 +96,18 @@ function takePhotoStream(client) {
       else{
         counter++;
       }
-    /*
+    
     }
     else if(global_counter==global_limit-1){
       console.log("global_counter "+global_counter);
-      //client.stop();
-      //client.land();
+      global_counter++;
+      client.stop();
+      client.land();
     } else if(global_counter==global_limit){
       console.log("global_counter "+global_counter);
-      exit();
+      process.exit();
     }
-    */
+    
   });
 }
 
@@ -176,7 +177,7 @@ function findTarget(img_url, period, client) {
       var vx = jsonData['vx'];
       var vy = jsonData['vy'];
       console.log('I should '+getNextAction(r,vx,vy));
-      // doAction(getNextAction(r,vx,vy),client);
+      doAction(getNextAction(r,vx,vy),client);
     }
   });
 
@@ -184,12 +185,14 @@ function findTarget(img_url, period, client) {
 
 function getNextAction(r,vx,vy){
 
+
   if(vx > TRESHOLD_X){
     direction = 'GO_RIGHT';
   }
   else if(vx < - TRESHOLD_X){
     direction = 'GO_LEFT';
-  }else if(r > TRESHOLD_RADIUS + EPSILON_RADIUS){
+  }else
+  if(r > TRESHOLD_RADIUS + EPSILON_RADIUS){
     direction = 'GO_BACK';
   }
   else if(r < TRESHOLD_RADIUS - EPSILON_RADIUS){
@@ -206,24 +209,23 @@ function doAction(action_keyword,client){
 
   switch(action_keyword) {
       case 'GO_RIGHT':
-          console.log("I am starting to go right");
           client.clockwise(SPEED_ROTATION);
+          setTimeout(function(){client.stop();},PERIOD_ROTATION);
           break;
       case 'GO_LEFT':
-          console.log("I am starting to go left");
           client.counterClockwise(SPEED_ROTATION);
+          setTimeout(function(){client.stop();},PERIOD_ROTATION);
           break;
       case 'GO_FORWARD':
           client.front(SPEED_TRANSLATION);
-          client.after(PERIOD_TRANSLATION, function(){this.stop();});
+          setTimeout(function(){client.stop();},PERIOD_TRANSLATION);
           break;
       case 'GO_BACK':
           client.back(SPEED_TRANSLATION);
-          client.after(PERIOD_TRANSLATION, function(){this.stop();});
+          setTimeout(function(){client.stop();},PERIOD_TRANSLATION);
           break;
       default:
           client.stop();
-          console.log(action_keyword);
           break;
   }
 
