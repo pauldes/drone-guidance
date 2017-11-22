@@ -4,7 +4,7 @@
 
 var currentPictureCount = 0;
 var dir = 'bin/';
-var FRAMERATE_TRACKING = 10;
+var FRAMERATE_TRACKING = 20;
 var TRESHOLD_X = 100;
 var TRESHOLD_RADIUS = 40;
 var EPSILON_RADIUS = 10;
@@ -26,17 +26,24 @@ function main(){
   client.animateLeds('snakeGreenRed', 5, 1)
   console.log("Success ! Starting operations");
 
-  client.takeoff();
+  //client.takeoff();
+
+  /*
   client.after(5000,function(){ doAction('GO_RIGHT',this);})
     .after(PERIOD_ROTATION, function(){this.stop(); doAction('GO_LEFT',this);})
     .after(PERIOD_ROTATION, function(){this.stop();})
     .after(2000,function(){ this.stop(); this.land(); })
     .after(5000, function() {process.exit();});
+*/
 
+  //process.wait(8);
 
-  //takePhotoStream(client);
+  //setTimeout(takePhotoStream(client),6000);
+
+  takePhotoStream(client);
+
   //require('ar-drone-png-stream')(client, { port: 8000 });
-  
+
 
   //client.takeoff();
   //doAction('GO_BACK',client);
@@ -55,21 +62,23 @@ function takePhotoStream(client) {
 
   var fs = require('fs');
   var pngStream = client.getPngStream();
-  var period = 10;
-  var counter = 10;
+  var period = 20;
+  var counter = 20;
 
   var global_counter = 0;
-  var global_limit = 20;
+  var global_limit = 10;
 
   pngStream.on('data', function (data) { // 'once' OR 'on'
 
-    if(global_counter==global_limit-1){
-      client.land();
-    } else if(global_counter==global_limit){
-      //nothing
-    } else {
+
+    //if(global_counter<global_limit-1){
+
       if (counter==period){
+
+        console.log("global_counter "+global_counter);
+
         global_counter++;
+
         counter = 0;
         var nowFormat = getDateTime();
 
@@ -87,7 +96,17 @@ function takePhotoStream(client) {
       else{
         counter++;
       }
+    /*
     }
+    else if(global_counter==global_limit-1){
+      console.log("global_counter "+global_counter);
+      //client.stop();
+      //client.land();
+    } else if(global_counter==global_limit){
+      console.log("global_counter "+global_counter);
+      exit();
+    }
+    */
   });
 }
 
@@ -189,11 +208,11 @@ function doAction(action_keyword,client){
       case 'GO_RIGHT':
           console.log("I am starting to go right");
           client.clockwise(SPEED_ROTATION);
-          break;  
+          break;
       case 'GO_LEFT':
           console.log("I am starting to go left");
           client.counterClockwise(SPEED_ROTATION);
-          break;    
+          break;
       case 'GO_FORWARD':
           client.front(SPEED_TRANSLATION);
           client.after(PERIOD_TRANSLATION, function(){this.stop();});
