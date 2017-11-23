@@ -85,7 +85,20 @@ def main(input_image_url):
       print('{"vx":'+str(int(vector_x))+', "vy":'+str(int(vector_y))+' , "r": '+str(biggest_blob_r)+ '}')
       #Draw the biggest circle
       cv2.circle(output, (biggest_blob_x, biggest_blob_y), biggest_blob_r, (0, 255, 0), 2)
+      #Draw line from image center to biggest cercle center
       cv2.line(output,(int(output.shape[1]/2),int(output.shape[0]/2)),(biggest_blob_x,biggest_blob_y),(0,255,0),2)
+
+
+      #Treshold print for presentation
+
+      # TRESHOLD_X = 100
+      # TRESHOLD_RADIUS = 40
+      # EPSILON_RADIUS = 10
+      # cv2.circle(output, (biggest_blob_x, biggest_blob_y), TRESHOLD_RADIUS - EPSILON_RADIUS, (255, 255, 0), 2)
+      # cv2.circle(output, (biggest_blob_x, biggest_blob_y), TRESHOLD_RADIUS + EPSILON_RADIUS, (255, 255, 0), 2)
+      # cv2.line(output,(int(output.shape[1]/2) + TRESHOLD_X, 0),(int(output.shape[1]/2) + TRESHOLD_X, output.shape[0]),(0,255,255),2)
+      # cv2.line(output,(int(output.shape[1]/2) - TRESHOLD_X, 0),(int(output.shape[1]/2) - TRESHOLD_X, output.shape[0]),(0,255,255),2)
+
     else:
       print('OUTRANGE_BLOB')
 
@@ -94,13 +107,13 @@ def main(input_image_url):
 
   cv2.namedWindow("output", cv2.WINDOW_NORMAL)
   cv2.imshow("output", output)
+
+  # Intermadiate images show and save
   
   # cv2.imwrite('output.png',output)
-
   # cv2.namedWindow("mask", cv2.WINDOW_NORMAL)
   # cv2.imshow("mask", mask)
   # cv2.imwrite('mask.png',mask)
-
   # cv2.namedWindow("hsv", cv2.WINDOW_NORMAL)
   # cv2.imshow("hsv", hsv)
   # cv2.imwrite('hsv.png',hsv)

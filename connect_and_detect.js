@@ -5,12 +5,12 @@
 var currentPictureCount = 0;
 var dir = 'bin/';
 var FRAMERATE_TRACKING = 10;
-var TRESHOLD_X = 100;
+var TRESHOLD_X = 150;
 var TRESHOLD_RADIUS = 40;
 var EPSILON_RADIUS = 10;
-var SPEED_ROTATION = 0.3;
+var SPEED_ROTATION = 0.2;
 var SPEED_TRANSLATION = 0.2;
-var PERIOD_ROTATION = 600;
+var PERIOD_ROTATION = 500;
 var PERIOD_TRANSLATION = 600;
 
 main();
@@ -28,25 +28,8 @@ function main(){
 
   client.takeoff();
 
-  /*
-  client.after(5000,function(){ doAction('GO_RIGHT',this);})
-    .after(PERIOD_ROTATION, function(){this.stop(); doAction('GO_LEFT',this);})
-    .after(PERIOD_ROTATION, function(){this.stop();})
-    .after(2000,function(){ this.stop(); this.land(); })
-    .after(5000, function() {process.exit();});
-*/
-
-  //process.wait(8);
-
   setTimeout(function(){takePhotoStream(client)},2000);
 
-  //takePhotoStream(client);
-
-  //require('ar-drone-png-stream')(client, { port: 8000 });
-
-
-  //client.takeoff();
-  //doAction('GO_BACK',client);
 
 /* client
    .after(5000, function() {this.clockwise(1);})
@@ -66,7 +49,7 @@ function takePhotoStream(client) {
   var counter = 10;
 
   var global_counter = 0;
-  var global_limit = 30;
+  var global_limit = 60;
 
   pngStream.on('data', function (data) { // 'once' OR 'on'
 
@@ -191,10 +174,12 @@ function getNextAction(r,vx,vy){
   }
   else if(vx < - TRESHOLD_X){
     direction = 'GO_LEFT';
-  }else
+  }
+  else
   if(r > TRESHOLD_RADIUS + EPSILON_RADIUS){
     direction = 'GO_BACK';
   }
+  
   else if(r < TRESHOLD_RADIUS - EPSILON_RADIUS){
     direction = 'GO_FORWARD';
   }
@@ -209,11 +194,13 @@ function doAction(action_keyword,client){
 
   switch(action_keyword) {
       case 'GO_RIGHT':
-          client.clockwise(SPEED_ROTATION);
+          //client.clockwise(SPEED_ROTATION);
+          client.right(SPEED_ROTATION);
           setTimeout(function(){client.stop();},PERIOD_ROTATION);
           break;
       case 'GO_LEFT':
-          client.counterClockwise(SPEED_ROTATION);
+          //client.counterClockwise(SPEED_ROTATION);
+          client.left(SPEED_ROTATION);
           setTimeout(function(){client.stop();},PERIOD_ROTATION);
           break;
       case 'GO_FORWARD':
