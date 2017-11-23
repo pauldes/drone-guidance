@@ -26,7 +26,7 @@ function main(){
   client.animateLeds('snakeGreenRed', 5, 1)
   console.log("Success ! Starting operations");
 
-  client.takeoff();
+  //client.takeoff();
 
   setTimeout(function(){takePhotoStream(client)},2000);
 
